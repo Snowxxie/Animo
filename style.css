@@ -89,7 +89,8 @@ body.car-theme { --primary-color:#EAB308; --secondary-color:#FACC15; --cursor-hu
 /* =========================
    BACKGROUND + OVERLAYS
 ========================= */
-.video-background { transform: scale(1.02); }
+.video-background { transform: scale(1.02);
+  z-index: -5; }
 
 .glitch-overlay,
 #hacker-overlay,
@@ -241,4 +242,23 @@ body.car-theme { --primary-color:#EAB308; --secondary-color:#FACC15; --cursor-hu
 
 @keyframes fast-orbit {
   to { transform: rotate(360deg); }
+}
+
+
+.cursor-trail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.cursor-trail-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: white;
+  transform: translate(-50%, -50%);
+  opacity: 0.8;
 }

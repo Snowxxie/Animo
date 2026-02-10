@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
-  const startMessage = "Click here to see the motion baby";
+  const startMessage = "Touch me harder :3";
   let startTextContent = '';
   let startIndex = 0;
   let startCursorVisible = true;
@@ -155,11 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     );
     if (!isTouchDevice) {
       try {
-        new cursorTrailEffect({
-          length: 10,
-          size: 8,
-          speed: 0.2
-        });
+        
         console.log("Cursor trail initialized");
       } catch (err) {
         console.error("Failed to initialize cursor trail effect:", err);
@@ -237,9 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const bioMessages = [
     "Fu*k Guns.lol & Fakecrime.bio got banned too often, so I created my own.",
-    "\"Hello, World!\""
+    "Rich"
   ];
-  let bioText = 'gugu gaga ';
+  let bioText = '';
   let bioIndex = 0;
   let bioMessageIndex = 0;
   let isBioDeleting = false;
@@ -447,11 +443,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   rainButton.addEventListener('click', () => {
-    switchTheme('assets/rain_background.mov', rainMusic, 'rain-theme', snowOverlay, true);
+    switchTheme('assets/rain.mp4', rainMusic, 'rain-theme', snowOverlay, true);
   });
   rainButton.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    switchTheme('assets/rain_background.mov', rainMusic, 'rain-theme', snowOverlay, true);
+    switchTheme('assets/rain.mp4', rainMusic, 'rain-theme', snowOverlay, true);
   });
 
   animeButton.addEventListener('click', () => {
@@ -681,3 +677,12 @@ document.addEventListener('pointerdown', () => {
 document.addEventListener('pointerdown', () => {
   document.body.style.cursor = 'none';
 });
+
+window.addEventListener("load", () => {
+  new cursoreffects.fairyDustCursor({
+    zIndex: 999999999,
+    colors: ["#ffffff"],
+    fairySymbol: "♡"
+  });
+});
+

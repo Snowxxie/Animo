@@ -40,7 +40,7 @@ Place your files into the `assets/` folder with these exact filenames:
 - `car_background.mp4`
 - `hacker_background.mp4`
 - `hacker_overlay.mp4`
-- `rain_background.mov`
+- `rain.mp4`
 - `snow_overlay.mp4`
 
 > 🎬 Use tools like [ClipConverter.cc](https://www.clipconverter.cc/) or [YTMP3.cc](https://ytmp3.cc/) to convert YouTube videos into `.mp4` or `.mov`.
