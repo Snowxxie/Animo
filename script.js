@@ -8,8 +8,8 @@ function initMedia() {
     console.error("Media elements not found");
     return;
   }
-  backgroundMusic.volume = 0.3;
-  backgroundVideo.muted = true; 
+  backgroundMusic.volume = 0.4;
+  backgroundVideo.muted = false; 
 
   
   backgroundVideo.play().catch(err => {
