@@ -67,7 +67,7 @@ Place your files into the `assets/` folder with these exact filenames:
 - `hated_fakecrime1.gif`
 - `owner.gif`
 - `partner.gif`
-- `staff.gif`
+- `Snowxxie.gif`
 - `rule_maker.gif`
 - `verified.gif`
 

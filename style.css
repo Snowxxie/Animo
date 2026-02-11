@@ -112,6 +112,26 @@ body.car-theme { --primary-color:#EAB308; --secondary-color:#FACC15; --cursor-hu
   max-width: 90vw;
   transform-style: preserve-3d;
   transition: transform .4s ease, background .3s ease;
+
+
+  background: rgba(20, 20, 30, 0.25);
+backdrop-filter: blur(25px);
+-webkit-backdrop-filter: blur(25px);
+
+border: 1px solid rgba(255,255,255,0.08);
+
+box-shadow:
+0 8px 40px rgba(0,0,0,0.6),
+inset 0 0 0 1px rgba(255,255,255,0.03);
+position: relative;
+overflow: hidden;
+background-image: linear-gradient(
+  135deg,
+  rgba(255,255,255,0.06),
+  rgba(255,255,255,0.01)
+);
+
+
 }
 
 #profile-block.profile-appear {
