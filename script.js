@@ -116,27 +116,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 500);
 
 
-  function initializeVisitorCounter() {
-    let totalVisitors = localStorage.getItem('totalVisitorCount');
-    if (!totalVisitors) {
-      totalVisitors = 1337;
-      localStorage.setItem('totalVisitorCount', totalVisitors);
-    } else {
-      totalVisitors = parseInt(totalVisitors);
-    }
+  // function initializeVisitorCounter() {
+  //   let totalVisitors = localStorage.getItem('totalVisitorCount');
+  //   if (!totalVisitors) {
+  //     totalVisitors = 1337;
+  //     localStorage.setItem('totalVisitorCount', totalVisitors);
+  //   } else {
+  //     totalVisitors = parseInt(totalVisitors);
+  //   }
 
-    const hasVisited = localStorage.getItem('hasVisited');
-    if (!hasVisited) {
-      totalVisitors++;
-      localStorage.setItem('totalVisitorCount', totalVisitors);
-      localStorage.setItem('hasVisited', 'true');
-    }
+  //   const hasVisited = localStorage.getItem('hasVisited');
+  //   if (!hasVisited) {
+  //     totalVisitors++;
+  //     localStorage.setItem('totalVisitorCount', totalVisitors);
+  //     localStorage.setItem('hasVisited', 'true');
+  //   }
 
-    visitorCount.textContent = totalVisitors.toLocaleString();
-  }
+  //   visitorCount.textContent = totalVisitors.toLocaleString();
+  // }
 
 
-  initializeVisitorCounter();
+  // initializeVisitorCounter();
+
+  fetch("https://countapi.xyz/hit/animo-profile/views")
+  .then(res => res.json())
+  .then(res => {
+    document.getElementById("visitor-count").textContent =
+      res.value.toLocaleString();
+  });
 
 
   startScreen.addEventListener('click', () => {
