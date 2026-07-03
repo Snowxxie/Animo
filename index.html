@@ -7,6 +7,7 @@
     <link rel="icon" href="assets/favicon.gif">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon.gif">
 
+
     <style>
         * { 
             margin: 0;
@@ -91,18 +92,20 @@
             display: flex;
             gap: 10px;
             z-index: 20;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(20, 20, 25, 0.55);
             padding: 5px 10px;
             border-radius: 20px;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .theme-button {
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background-color: rgba(255, 255, 255, 0.05);
             cursor: none;
             display: flex;
             align-items: center;
@@ -110,27 +113,18 @@
             transition: all 0.3s;
             font-size: 14px;
             font-weight: bold;
+            backdrop-filter: blur(10px);
         }
 
         .theme-button:hover {
             transform: scale(1.1);
-            border-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
         
-        .volume-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    
 
-        .volume-icon {
-            width: 20px;
-            height: 20px;
-            cursor: none;
-            display: flex;
-            color: white;
-        }
 
         .slider {
             -webkit-appearance: none;
@@ -152,34 +146,7 @@
             cursor: none;
         }
 
-        
-        .transparency-control {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .transparency-icon {
-            width: 20px;
-            height: 20px;
-            color: white;
-        }
-
-        
-        .top-controls {
-            position: fixed;
-            bottom: calc(50% - 240px - 60px);
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 20;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 8px 12px;
-            border-radius: 20px;
-            backdrop-filter: blur(5px);
-        }
+    
 
         
         #profile-block {
@@ -189,15 +156,16 @@
             transform: translate(-50%, -50%);
             width: 820px;
             min-height: 332px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(20, 20, 25, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 18px;
             z-index: 20;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(18px) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             opacity: 0;
             transform-style: preserve-3d;
             transition: transform 0.5s ease-out;
@@ -796,20 +764,8 @@
             }
 
             
-            .top-controls {
-                bottom: 70px;
-                gap: 10px;
-                padding: 6px 10px;
-            }
-
-            .volume-control, .transparency-control {
-                gap: 6px;
-            }
-
-            .volume-icon, .transparency-icon {
-                width: 18px;
-                height: 18px;
-            }
+         
+        
 
             .slider {
                 width: 60px;
@@ -845,13 +801,59 @@
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Retro+Gaming&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
 </head>
+
+
+
 <body class="home-theme" onload="initMedia()">
     
     <div class="custom-cursor"></div>
     <div class="cursor-trail"></div>
 
 
+<!-- =========================
+     SPOTIFY PLAYER
+========================= -->
+<div id="spotify-player">
+
+    <div class="player-top">
+        <img id="album-art" src="assets/cover.gif">
+
+        <div class="player-info">
+            <div id="song-name">No song</div>
+            <div id="artist-name">Animo</div>
+        </div>
+    </div>
+
+    <div class="progress-wrapper">
+        <span id="current-time">0:00</span>
+        <input type="range" id="progress" value="0" min="0" max="100">
+        <span id="duration">0:00</span>
+    </div>
+
+    <div class="music-controls">
+        <button id="shuffle"><img src="assets/icons/shuffle.png"></button>
+        <button id="prev"><img src="assets/icons/prev.png"></button>
+        <button id="play"><img src="assets/icons/play.png"></button>
+        <button id="next"><img src="assets/icons/next.png"></button>
+    </div>
+
+</div>
+
+<!-- =========================
+     VOLUME (BOTTOM LEFT)
+========================= -->
+<div id="volume-container">
+    <button id="volume-btn" type="button">
+        <img id="volume-img" src="assets/volume.png" alt="volume">
+    </button>
+
+
+
+
+<audio id="music-player"></audio>
     
     <div id="start-screen">
         <div id="start-text"></div>
@@ -959,7 +961,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                     </svg>
-                    <span id="visitor-count">1337</span>
+                    <span id="visitor-count">1437</span>
                     <span class="tooltip">Profile Views</span>
                 </div>
             </div>
@@ -1016,45 +1018,7 @@
         </div>
 
 
-        <div class="top-controls">
-            <div class="volume-control">
-                <svg id="volume-icon" class="volume-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
-                </svg>
-                <input id="volume-slider" class="slider" type="range" min="0" max="1" step="0.01" value="0.3">
-            </div>
-            <div class="transparency-control">
-                <svg class="transparency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                </svg>
-                <input id="transparency-slider" class="slider" type="range" min="0" max="1" step="0.01" value="0.7">
-            </div>
-        </div>
-    </div>
-
-
-    <audio id="background-music" loop>
-        <source src="assets/background_music.mp3" type="audio/mp3">
-    </audio>
-    <audio id="hacker-music" loop muted>
-        <source src="assets/hacker_music.mp3" type="audio/mp3">
-    </audio>
-    <audio id="rain-music" loop muted>
-        <source src="assets/rain.mp3" type="audio/mp3">
-    </audio>
-    <audio id="anime-music" loop muted>
-        <source src="assets/anime_music.mp3" type="audio/mp3">
-    </audio>
-    <audio id="car-music" loop muted>
-        <source src="assets/car_music.mp3" type="audio/mp3">
-    </audio>
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
- <script src="https://unpkg.com/cursor-effects@latest/dist/browser.js"></script>
-
 
     <script src="https://unpkg.com/cursor-effects@latest/dist/browser.js"></script>
     <script src="script.js"></script>

@@ -1,33 +1,44 @@
 let hasUserInteracted = false;
+const audio = document.getElementById("music-player");
+const songName = document.getElementById("song-name");
+const artistName = document.getElementById("artist-name");
 
-function initMedia() {
-  console.log("initMedia called");
-  const backgroundMusic = document.getElementById('background-music');
-  const backgroundVideo = document.getElementById('background');
-  if (!backgroundMusic || !backgroundVideo) {
-    console.error("Media elements not found");
-    return;
-  }
-  backgroundMusic.volume = 0.4;
-  backgroundVideo.muted = true; 
+if (!audio) {
+  console.error("Audio element not found!");
+}
 
-  
-  backgroundVideo.play().catch(err => {
-    console.error("Failed to play background video:", err);
-  });
+if (!songName || !artistName) {
+  console.error("Player metadata elements not found!");
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (!audio) {
+    return;
+  }
+  
+  audio.volume = 0.5;
+  audio.muted = false;
+  if (songName && artistName) {
+    loadSong(currentSong);
+  }
+  window.audioElement = audio; // Store globally for access outside DOMContentLoaded
+document.body.addEventListener("click", () => {
+
+    if (!audio.src) {
+        loadSong(currentSong);
+    }
+
+}, { once: true });
+
+
+
+
+
   const startScreen = document.getElementById('start-screen');
   const startText = document.getElementById('start-text');
   const profileName = document.getElementById('profile-name');
   const profileBio = document.getElementById('profile-bio');
   const visitorCount = document.getElementById('visitor-count');
-  const backgroundMusic = document.getElementById('background-music');
-  const hackerMusic = document.getElementById('hacker-music');
-  const rainMusic = document.getElementById('rain-music');
-  const animeMusic = document.getElementById('anime-music');
-  const carMusic = document.getElementById('car-music');
   const homeButton = document.getElementById('home-theme');
   const hackerButton = document.getElementById('hacker-theme');
   const rainButton = document.getElementById('rain-theme');
@@ -35,9 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const carButton = document.getElementById('car-theme');
   const resultsButtonContainer = document.getElementById('results-button-container');
   const resultsButton = document.getElementById('results-theme');
-  const volumeIcon = document.getElementById('volume-icon');
-  const volumeSlider = document.getElementById('volume-slider');
-  const transparencySlider = document.getElementById('transparency-slider');
+  const volumeBtn = document.getElementById('volume-btn');
+  const volumeImg = document.getElementById('volume-img');
   const backgroundVideo = document.getElementById('background');
   const hackerOverlay = document.getElementById('hacker-overlay');
   const snowOverlay = document.getElementById('snow-overlay');
@@ -53,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const socialIcons = document.querySelectorAll('.social-icon');
   const badges = document.querySelectorAll('.badge');
 
-  
   const cursor = document.querySelector('.custom-cursor');
   const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
 
@@ -138,20 +147,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // initializeVisitorCounter();
 
-  fetch("https://countapi.xyz/hit/animo-profile/views")
-  .then(res => res.json())
-  .then(res => {
-    document.getElementById("visitor-count").textContent =
-      res.value.toLocaleString();
-  });
-
 
   startScreen.addEventListener('click', () => {
     startScreen.classList.add('hidden');
-    backgroundMusic.muted = false;
-    backgroundMusic.play().catch(err => {
-      console.error("Failed to play music after start screen click:", err);
-    });
+
+    // Start music immediately
+    if (!audio.src) {
+        loadSong(currentSong);
+    }
+
+    audio.play().catch(err => console.error(err));
+
     profileBlock.classList.remove('hidden');
     gsap.fromTo(profileBlock,
       { opacity: 0, y: -50 },
@@ -160,49 +166,11 @@ document.addEventListener('DOMContentLoaded', () => {
         profileContainer.classList.add('orbit');
       }}
     );
-    if (!isTouchDevice) {
-      try {
-        
-        console.log("Cursor trail initialized");
-      } catch (err) {
-        console.error("Failed to initialize cursor trail effect:", err);
-      }
-    }
+
     typeWriterName();
     typeWriterBio();
-  });
-
-  startScreen.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    startScreen.classList.add('hidden');
-    backgroundMusic.muted = false;
-    backgroundMusic.play().catch(err => {
-      console.error("Failed to play music after start screen touch:", err);
-    });
-    profileBlock.classList.remove('hidden');
-    gsap.fromTo(profileBlock,
-      { opacity: 0, y: -50 },
-      { opacity: 1, y: 0, duration: 1, ease: 'power2.out', onComplete: () => {
-        profileBlock.classList.add('profile-appear');
-        profileContainer.classList.add('orbit');
-      }}
-    );
-    if (!isTouchDevice) {
-      try {
-        new cursorTrailEffect({
-          length: 10,
-          size: 8,
-          speed: 0.2
-        });
-        console.log("Cursor trail initialized");
-      } catch (err) {
-        console.error("Failed to initialize cursor trail effect:", err);
-      }
-    }
-    typeWriterName();
-    typeWriterBio();
-  });
-
+});
+  
 
   const name = "Λnimo<3";
   let nameText = '';
@@ -234,14 +202,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setInterval(() => {
     nameCursorVisible = !nameCursorVisible;
-    profileName.textContent = nameText + (nameCursorVisible ? '|' : ' ');
+    profileName.textContent = nameText + (nameCursorVisible ? '𖤐' : ' ');
   }, 500);
 
 
   const bioMessages = [
-    "Fu*k Guns.lol & Fakecrime.bio got banned too often, so I created my own.",
-    "Rich"
-  ];
+    "I got 'em nuts with lemons",
+    "I'm Ballin, Ballin you know...",
+    "Gettin those bitches wet with my drip..."
+   ];
   let bioText = '';
   let bioIndex = 0;
   let bioMessageIndex = 0;
@@ -277,85 +246,97 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 500);
 
 
-  let currentAudio = backgroundMusic;
+
+
   let isMuted = false;
 
-  volumeIcon.addEventListener('click', () => {
-    isMuted = !isMuted;
-    currentAudio.muted = isMuted;
-    volumeIcon.innerHTML = isMuted
-      ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>`
-      : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>`;
-  });
+  // Ensure audio is accessible for volume control
+  console.log('Audio element:', audio);
+  console.log('Initial audio volume:', audio.volume);
+  console.log('Volume button element:', volumeBtn);
 
-  volumeIcon.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    isMuted = !isMuted;
-    currentAudio.muted = isMuted;
-    volumeIcon.innerHTML = isMuted
-      ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path>`
-      : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>`;
-  });
+  // Volume button click handler
+  if (volumeBtn) {
+    volumeBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      audio.muted = isMuted;
+      if (volumeImg) {
+        volumeImg.src = isMuted ? 'assets/volume-muted.png' : 'assets/volume.png';
+      }
+      console.log('Volume muted toggled:', isMuted, 'Audio muted:', audio.muted);
+    });
 
-  volumeSlider.addEventListener('input', () => {
-    currentAudio.volume = volumeSlider.value;
-    isMuted = false;
-    currentAudio.muted = false;
-    volumeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>`;
-  });
+    volumeBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      isMuted = !isMuted;
+      audio.muted = isMuted;
+      if (volumeImg) {
+        volumeImg.src = isMuted ? 'assets/volume-muted.png' : 'assets/volume.png';
+      }
+      console.log('Volume muted toggled (touch):', isMuted);
+    });
+  } else {
+    console.warn('Volume button not found!');
+  }
+
+  // Volume slider is removed; keep button only.
 
 
-  transparencySlider.addEventListener('input', () => {
-    const opacity = transparencySlider.value;
-    if (opacity == 0) {
-      profileBlock.style.background = 'rgba(0, 0, 0, 0)';
-      profileBlock.style.borderOpacity = '0';
-      profileBlock.style.borderColor = 'transparent';
-      profileBlock.style.backdropFilter = 'none';
-      skillsBlock.style.background = 'rgba(0, 0, 0, 0)';
-      skillsBlock.style.borderOpacity = '0';
-      skillsBlock.style.borderColor = 'transparent';
-      skillsBlock.style.backdropFilter = 'none';
-   
-      profileBlock.style.pointerEvents = 'auto';
-      socialIcons.forEach(icon => {
-        icon.style.pointerEvents = 'auto';
-        icon.style.opacity = '1';
-      });
-      badges.forEach(badge => {
-        badge.style.pointerEvents = 'auto';
-        badge.style.opacity = '1';
-      });
-      profilePicture.style.pointerEvents = 'auto';
-      profilePicture.style.opacity = '1';
-      profileName.style.opacity = '1';
-      profileBio.style.opacity = '1';
-      visitorCount.style.opacity = '1';
-    } else {
-      profileBlock.style.background = `rgba(0, 0, 0, ${opacity})`;
-      profileBlock.style.borderOpacity = opacity;
-      profileBlock.style.borderColor = '';
-      profileBlock.style.backdropFilter = `blur(${10 * opacity}px)`;
-      skillsBlock.style.background = `rgba(0, 0, 0, ${opacity})`;
-      skillsBlock.style.borderOpacity = opacity;
-      skillsBlock.style.borderColor = '';
-      skillsBlock.style.backdropFilter = `blur(${10 * opacity}px)`;
-      profileBlock.style.pointerEvents = 'auto';
-      socialIcons.forEach(icon => {
-        icon.style.pointerEvents = 'auto';
-        icon.style.opacity = '1';
-      });
-      badges.forEach(badge => {
-        badge.style.pointerEvents = 'auto';
-        badge.style.opacity = '1';
-      });
-      profilePicture.style.pointerEvents = 'auto';
-      profilePicture.style.opacity = '1';
-      profileName.style.opacity = '1';
-      profileBio.style.opacity = '1';
-      visitorCount.style.opacity = '1';
-    }
-  });
+  // Transparency slider - safely handle if it exists
+  const transparencySlider = document.getElementById('transparency-slider');
+  if (transparencySlider) {
+    transparencySlider.addEventListener('input', () => {
+      const opacity = transparencySlider.value;
+      if (opacity == 0) {
+        profileBlock.style.background = 'rgba(0, 0, 0, 0)';
+        profileBlock.style.borderOpacity = '0';
+        profileBlock.style.borderColor = 'transparent';
+        profileBlock.style.backdropFilter = 'none';
+        skillsBlock.style.background = 'rgba(0, 0, 0, 0)';
+        skillsBlock.style.borderOpacity = '0';
+        skillsBlock.style.borderColor = 'transparent';
+        skillsBlock.style.backdropFilter = 'none';
+     
+        profileBlock.style.pointerEvents = 'auto';
+        socialIcons.forEach(icon => {
+          icon.style.pointerEvents = 'auto';
+          icon.style.opacity = '1';
+        });
+        badges.forEach(badge => {
+          badge.style.pointerEvents = 'auto';
+          badge.style.opacity = '1';
+        });
+        profilePicture.style.pointerEvents = 'auto';
+        profilePicture.style.opacity = '1';
+        profileName.style.opacity = '1';
+        profileBio.style.opacity = '1';
+        visitorCount.style.opacity = '1';
+      } else {
+        profileBlock.style.background = `rgba(0, 0, 0, ${opacity})`;
+        profileBlock.style.borderOpacity = opacity;
+        profileBlock.style.borderColor = '';
+        profileBlock.style.backdropFilter = `blur(${10 * opacity}px)`;
+        skillsBlock.style.background = `rgba(0, 0, 0, ${opacity})`;
+        skillsBlock.style.borderOpacity = opacity;
+        skillsBlock.style.borderColor = '';
+        skillsBlock.style.backdropFilter = `blur(${10 * opacity}px)`;
+        profileBlock.style.pointerEvents = 'auto';
+        socialIcons.forEach(icon => {
+          icon.style.pointerEvents = 'auto';
+          icon.style.opacity = '1';
+        });
+        badges.forEach(badge => {
+          badge.style.pointerEvents = 'auto';
+          badge.style.opacity = '1';
+        });
+        profilePicture.style.pointerEvents = 'auto';
+        profilePicture.style.opacity = '1';
+        profileName.style.opacity = '1';
+        profileBio.style.opacity = '1';
+        visitorCount.style.opacity = '1';
+      }
+    });
+  }
 
 
   function switchTheme(videoSrc, audio, themeClass, overlay = null, overlayOverProfile = false) {
@@ -388,14 +369,9 @@ document.addEventListener('DOMContentLoaded', () => {
       onComplete: () => {
         backgroundVideo.src = videoSrc;
 
-        if (currentAudio) {
-          currentAudio.pause();
-          currentAudio.currentTime = 0;
-        }
-        currentAudio = audio;
-        currentAudio.volume = volumeSlider.value;
-        currentAudio.muted = isMuted;
-        currentAudio.play().catch(err => console.error("Failed to play theme music:", err));
+      // theme audio disabled — using Spotify player only
+
+        // currentAudio.play().catch(err => console.error("Failed to play theme music:", err));
 
         document.body.classList.remove('home-theme', 'hacker-theme', 'rain-theme', 'anime-theme', 'car-theme');
         document.body.classList.add(themeClass);
@@ -433,45 +409,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 
-  homeButton.addEventListener('click', () => {
-    switchTheme('assets/background.mp4', backgroundMusic, 'home-theme');
-  });
-  homeButton.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    switchTheme('assets/background.mp4', backgroundMusic, 'home-theme');
-  });
-
-  hackerButton.addEventListener('click', () => {
-    switchTheme('assets/hacker_background.mp4', hackerMusic, 'hacker-theme', hackerOverlay, false);
-  });
-  hackerButton.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    switchTheme('assets/hacker_background.mp4', hackerMusic, 'hacker-theme', hackerOverlay, false);
-  });
-
-  rainButton.addEventListener('click', () => {
-    switchTheme('assets/rain.mp4', rainMusic, 'rain-theme', snowOverlay, true);
-  });
-  rainButton.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    switchTheme('assets/rain.mp4', rainMusic, 'rain-theme', snowOverlay, true);
-  });
-
-  animeButton.addEventListener('click', () => {
-    switchTheme('assets/anime_background.mp4', animeMusic, 'anime-theme');
-  });
-  animeButton.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    switchTheme('assets/anime_background.mp4', animeMusic, 'anime-theme');
-  });
-
-  carButton.addEventListener('click', () => {
-    switchTheme('assets/car_background.mp4', carMusic, 'car-theme');
-  });
-  carButton.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    switchTheme('assets/car_background.mp4', carMusic, 'car-theme');
-  });
 
  
   function handleTilt(e, element) {
@@ -693,3 +630,118 @@ window.addEventListener("load", () => {
   });
 });
 
+
+
+const songs = [
+// { file: "assets/songs/bankai.mp3", name: "Bankai", artist: "Animo" },
+ { file: "assets/songs/jdm_drift.mp3", name: "JDM Drift", artist: "Animo" },
+ { file: "assets/songs/popthatrunk.mp3", name: "Pop Tha Trunk", artist: "Animo" },
+ { file: "assets/songs/honour.mp3", name: "Honour", artist: "Animo" },
+ { file: "assets/songs/step_back.mp3", name: "Step Back", artist: "Animo" },
+ { file: "assets/songs/zoom.mp3", name: "Zoom", artist: "Animo" },
+ { file: "assets/songs/chrome_beretta.mp3", name: "Chrome Beretta", artist: "Animo" }
+ 
+];
+
+
+let currentSong = 5;
+let isShuffle = false;
+
+function loadSong(index){
+    audio.src = songs[index].file;
+    audio.load();
+    if (songName) {
+      songName.textContent = songs[index].name;
+    }
+    if (artistName) {
+      artistName.textContent = songs[index].artist;
+    }
+}
+
+const progress = document.getElementById("progress");
+const currentTimeEl = document.getElementById("current-time");
+const durationEl = document.getElementById("duration");
+
+audio.addEventListener("timeupdate", () => {
+    if (audio.duration) {
+        progress.value = (audio.currentTime / audio.duration) * 100;
+        currentTimeEl.textContent = formatTime(audio.currentTime);
+    }
+});
+
+audio.addEventListener("loadedmetadata", () => {
+    if (audio.duration) {
+        durationEl.textContent = formatTime(audio.duration);
+    }
+});
+
+progress.addEventListener("input", () => {
+    if (audio.duration) {
+        audio.currentTime = (progress.value / 100) * audio.duration;
+    }
+});
+
+
+
+const playBtn = document.getElementById("play");
+const playIcon = playBtn.querySelector("img");
+const nextBtn = document.getElementById("next");
+const prevBtn = document.getElementById("prev");
+
+playBtn.addEventListener("click", () => {
+
+    if (audio.paused) {
+        audio.play();
+    } else {
+        audio.pause();
+    }
+
+});
+audio.addEventListener("play", () => {
+    playIcon.src = "assets/icons/pause.png";
+});
+
+audio.addEventListener("pause", () => {
+    playIcon.src = "assets/icons/play.png";
+});
+
+
+nextBtn.onclick = () => {
+
+    if (isShuffle) {
+        currentSong = Math.floor(Math.random() * songs.length);
+    } else {
+        currentSong = (currentSong + 1) % songs.length;
+    }
+
+    loadSong(currentSong);
+    audio.load();
+    audio.play();
+};
+
+prevBtn.onclick = () => {
+    currentSong = (currentSong - 1 + songs.length) % songs.length;
+    loadSong(currentSong);
+    audio.load();   // ⭐ VERY IMPORTANT
+    audio.play();
+};
+
+audio.addEventListener("ended", () => {
+
+    if (isShuffle) {
+        currentSong = Math.floor(Math.random() * songs.length);
+    } else {
+        currentSong = (currentSong + 1) % songs.length;
+    }
+
+    loadSong(currentSong);
+    audio.load();
+    audio.play();
+});
+
+function formatTime(seconds){
+    if (!seconds || isNaN(seconds)) return "0:00";
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s < 10 ? "0" + s : s}`;
+}
